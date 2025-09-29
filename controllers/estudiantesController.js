@@ -22,7 +22,10 @@ export function crearEstudiante(req, res) {
       "INSERT INTO estudiantes (name, age) VALUES (?, ?)"
     );
     const info = stmt.run(name, age);
-    res.status(201).json({ id: info.lastInsertRowid, name, age });
+    res
+      .status(201)
+      .location(`/estudiantes/${info.lastInsertRowid}`)
+      .json({ id: info.lastInsertRowid, name, age });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Database error" });

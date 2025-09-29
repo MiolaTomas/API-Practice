@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   getEstudiantes,
   crearEstudiante,
@@ -6,8 +7,7 @@ import {
 
 const router = Router();
 
-// GET /students
-router.get("/all", getEstudiantes);
-router.post("/crearEstudiante", crearEstudiante);
+router.get("/", getEstudiantes);
+router.post("/", crearEstudiante);
 
 export default router;

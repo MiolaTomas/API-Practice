@@ -1,9 +1,9 @@
-# POST http://localhost:3000/estudiantes/crearEstudiante
-# Content-Type: application/json
+ POST http://localhost:3000/estudiantes/crearEstudiante
+ Content-Type: application/json
 
-# {
-#   "name": "Carlos",
-#   "age": 22
-# }
+ {
+   "name": "Antonio",
+ "age": 23
+ }
 
-GET http://localhost:3000/estudiantes/all
+# GET http://localhost:3000/estudiantes/all

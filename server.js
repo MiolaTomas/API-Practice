@@ -1,18 +1,28 @@
 import express from "express";
 import db from "./db/database.js";
-//Aca no entendia como se ejecutaba el codigo de database.js, resulta que una vez que importas algo usando js modules node ejecuta todo el archivo, de arriba a abajo una sola vez y despues devuelve lo que exporta el archivo
 import studentsRoutes from "./routes/estudiantes.js";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Parse JSON request bodies
 app.use(express.json());
 
+// Load Swagger YAML
+const swaggerDocument = YAML.load("./swagger.yaml");
+
+// Serve Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Test route
 app.get("/", (req, res) => res.send("API running"));
 
-//Rutas
+// Register student routes
 app.use("/estudiantes", studentsRoutes);
 
+// Debug: print all students on startup
 const students = db.prepare("SELECT * FROM estudiantes").all();
 console.log("All students in DB:", students);
 

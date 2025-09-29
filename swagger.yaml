@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Estudiantes API
+  version: 1.0.0
+  description: API para manejar estudiantes
+paths:
+  /estudiantes:
+    get:
+      summary: Obtiene todos los estudiantes
+      tags:
+        - Estudiantes
+      responses:
+        200:
+          description: Lista de estudiantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Alice
+                    age:
+                      type: integer
+                      example: 22
+        500:
+          description: Error del servidor
+
+    post:
+      summary: Crea un nuevo estudiante
+      tags:
+        - Estudiantes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - age
+              properties:
+                name:
+                  type: string
+                  example: Alice
+                age:
+                  type: integer
+                  example: 22
+      responses:
+        201:
+          description: Estudiante creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: Alice
+                  age:
+                    type: integer
+                    example: 22
+        400:
+          description: Faltan datos obligatorios
+        500:
+          description: Error del servidor
