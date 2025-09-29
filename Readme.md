@@ -24,3 +24,18 @@ import Database from "better-sqlite3";
 
 const db = new Database("database.sqlite");
 ```
+
+## 🔹 Truthy and Falsy
+
+### Valores FALSY = false, 0, "", null, undefined, NaN, 0n
+
+### Valores TRUTHY = "0", [], {}, >0, functions
+
+```js
+if (0) {
+    Este codigo no va a funcionar
+}
+if ([]) {
+    Este codigo si va a funcionar
+}
+```

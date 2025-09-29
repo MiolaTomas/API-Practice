@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { getAllStudents } from "../controllers/estudiantesController.js";
+import {
+  getEstudiantes,
+  crearEstudiante,
+} from "../controllers/estudiantesController.js";
 
 const router = Router();
 
 // GET /students
-router.get("/all", getAllStudents);
+router.get("/all", getEstudiantes);
+router.post("/crearEstudiante", crearEstudiante);
 
 export default router;
