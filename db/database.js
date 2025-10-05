@@ -1,34 +1,57 @@
+// db.js
 import Database from "better-sqlite3";
+import path from "path";
+import { fileURLToPath } from "url";
 
-//Creamos una instancia de Database y especificamos el nombre del archivo de la base de datos
-//Si ese archivo no existe se crea en este momento
-//El objeto db representa la conexion a la base de datos y lo vamos a usar para ejecutar las queries
-const db = new Database("database.sqlite");
+// Configurar la ruta de la base de datos
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-//"prepare" es un metodo del objeto db y nos devuelve un objeto que representa la query, ese objeto nos da metodos como .run() el cual se usa para INSERT, UPDATE o DELETE (queries que no devuelven filas)
+// Aquí se crea (o abre) la base de datos SQLite
+const db = new Database(path.join(__dirname, "turnos.db"), {
+  verbose: console.log,
+});
+
+// --- Crear tablas si no existen ---
 db.prepare(
   `
-  CREATE TABLE IF NOT EXISTS estudiantes (
+  CREATE TABLE IF NOT EXISTS pacientes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    age INTEGER NOT NULL
+    nombre TEXT NOT NULL,
+    apellido TEXT NOT NULL,
+    dni TEXT UNIQUE,
+    email TEXT,
+    telefono TEXT
   )
 `
 ).run();
 
-// Al inicio nuestra tabla esta vacia asi que le añadimos informacion
-// .get() nos devuelve un objeto, algo parecido a esto => { count: 3 }, que nos indica cuentas filas tiene nuestra tabla, lo cual usamos para evaluar si es cero
-const count = db
-  .prepare("SELECT COUNT(*) AS count FROM estudiantes")
-  .get().count;
-if (count === 0) {
-  const insert = db.prepare(
-    "INSERT INTO estudiantes (name, age) VALUES (?, ?)"
-  );
-  insert.run("Tomas", 21);
-  insert.run("Aron", 23);
-  insert.run("Connor", 31);
-  console.log("🟢 Seeded students table");
-}
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS doctores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    apellido TEXT NOT NULL,
+    especialidad TEXT,
+    email TEXT,
+    telefono TEXT
+  )
+`
+).run();
 
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS turnos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    paciente_id INTEGER NOT NULL,
+    doctor_id INTEGER NOT NULL,
+    fecha_hora TEXT NOT NULL,
+    estado TEXT DEFAULT 'pendiente',
+    FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
+    FOREIGN KEY (doctor_id) REFERENCES doctores(id)
+  )
+`
+).run();
+
+// Exportamos la instancia de la DB para usarla en otros archivos
 export default db;
