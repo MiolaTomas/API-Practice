@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: API Pacientes
   description: API para manejar pacientes en el sistema de turnos médicos
-  version: 1.0.0
+  version: 1.0.2
 servers:
   - url: http://localhost:3000
 
@@ -35,6 +35,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Paciente"
+        "400":
+          description: Datos inválidos o campos faltantes
 
   /pacientes/{id}:
     get:
@@ -76,6 +78,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Paciente"
+        "400":
+          description: Datos inválidos o campos faltantes
         "404":
           description: Paciente no encontrado
 
@@ -89,7 +93,7 @@ paths:
             type: integer
       responses:
         "200":
-          description: Paciente eliminado
+          description: Paciente eliminado correctamente
         "404":
           description: Paciente no encontrado
 
@@ -100,30 +104,50 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         nombre:
           type: string
+          example: Juan
         apellido:
           type: string
+          example: Pérez
         dni:
           type: string
+          example: "43235290"
         email:
           type: string
+          example: juan.perez@example.com
         telefono:
           type: string
+          example: "+541123456789"
 
     PacienteInput:
       type: object
       required:
-        - nombre
-        - apellido
+        - dni
+        - email
+        - telefono
       properties:
         nombre:
           type: string
+          example: Juan
+          description: Opcional
         apellido:
           type: string
+          example: Pérez
+          description: Opcional
         dni:
           type: string
+          pattern: "^[0-9]{7,8}$"
+          example: "43235290"
+          description: Debe contener solo números y tener entre 7 y 8 dígitos.
         email:
           type: string
+          format: email
+          example: juan.perez@example.com
+          description: Debe tener un formato de correo electrónico válido.
         telefono:
           type: string
+          pattern: "^\\+?\\d{7,15}$"
+          example: "+541123456789"
+          description: Puede incluir un prefijo internacional (+54) y debe tener entre 7 y 15 dígitos.

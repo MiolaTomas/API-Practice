@@ -33,6 +33,54 @@ export const getPacienteById = (req, res) => {
 export const createPaciente = (req, res) => {
   try {
     const { nombre, apellido, dni, email, telefono } = req.body;
+
+    // --- Validaciones ---
+    if (!nombre || !apellido || !dni || !email || !telefono) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "Todos los campos (nombre, apellido, dni, email, telefono) son requeridos",
+        });
+    }
+
+    // DNI: solo números y 7–8 dígitos
+    if (!/^\d{7,8}$/.test(dni)) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "El DNI debe contener solo números y tener entre 7 y 8 dígitos",
+        });
+    }
+
+    // Email: formato válido
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Formato de email no válido" });
+    }
+
+    // Teléfono: solo números, 8–15 dígitos
+    if (!/^\d{8,15}$/.test(telefono)) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "El teléfono debe contener solo números y tener entre 8 y 15 dígitos",
+        });
+    }
+
+    // Evitar duplicados de email o DNI
+    const existing = db
+      .prepare("SELECT * FROM pacientes WHERE dni = ? OR email = ?")
+      .get(dni, email);
+
+    if (existing) {
+      return res
+        .status(409)
+        .json({ error: "Ya existe un paciente con el mismo DNI o email" });
+    }
+
+    // --- Inserción en DB ---
     const stmt = db.prepare(
       "INSERT INTO pacientes (nombre, apellido, dni, email, telefono) VALUES (?, ?, ?, ?, ?)"
     );
@@ -53,26 +101,65 @@ export const createPaciente = (req, res) => {
 export const updatePaciente = (req, res) => {
   try {
     const { nombre, apellido, dni, email, telefono } = req.body;
+
+    // Validaciones similares a create
+    if (!nombre || !apellido || !dni || !email || !telefono) {
+      return res.status(400).json({ error: "Todos los campos son requeridos" });
+    }
+
+    if (!/^\d{7,8}$/.test(dni)) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "El DNI debe contener solo números y tener entre 7 y 8 dígitos",
+        });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Formato de email no válido" });
+    }
+
+    if (!/^\d{8,15}$/.test(telefono)) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "El teléfono debe contener solo números y tener entre 8 y 15 dígitos",
+        });
+    }
+
+    // Comprobar si existe
+    const exists = db
+      .prepare("SELECT * FROM pacientes WHERE id = ?")
+      .get(req.params.id);
+    if (!exists)
+      return res.status(404).json({ error: "Paciente no encontrado" });
+
+    // Evitar duplicados en otro registro
+    const duplicate = db
+      .prepare(
+        "SELECT * FROM pacientes WHERE (dni = ? OR email = ?) AND id != ?"
+      )
+      .get(dni, email, req.params.id);
+
+    if (duplicate) {
+      return res
+        .status(409)
+        .json({ error: "Otro paciente ya tiene este DNI o email" });
+    }
+
+    // Actualizar
     const stmt = db.prepare(
       "UPDATE pacientes SET nombre = ?, apellido = ?, dni = ?, email = ?, telefono = ? WHERE id = ?"
     );
-    const info = stmt.run(
-      nombre,
-      apellido,
-      dni,
-      email,
-      telefono,
-      req.params.id
-    );
+    stmt.run(nombre, apellido, dni, email, telefono, req.params.id);
 
-    if (info.changes === 0)
-      return res.status(404).json({ error: "Paciente no encontrado" });
-
-    const updatedPaciente = db
+    const updated = db
       .prepare("SELECT * FROM pacientes WHERE id = ?")
       .get(req.params.id);
 
-    res.json(updatedPaciente);
+    res.json(updated);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error al actualizar paciente" });
