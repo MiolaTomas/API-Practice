@@ -36,22 +36,16 @@ export const createPaciente = (req, res) => {
 
     // --- Validaciones ---
     if (!nombre || !apellido || !dni || !email || !telefono) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Todos los campos (nombre, apellido, dni, email, telefono) son requeridos",
-        });
+      return res.status(400).json({
+        error: "Todos los campos (dni, email, telefono) son requeridos",
+      });
     }
 
     // DNI: solo números y 7–8 dígitos
     if (!/^\d{7,8}$/.test(dni)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "El DNI debe contener solo números y tener entre 7 y 8 dígitos",
-        });
+      return res.status(400).json({
+        error: "El DNI debe contener solo números y tener entre 7 y 8 dígitos",
+      });
     }
 
     // Email: formato válido
@@ -61,12 +55,10 @@ export const createPaciente = (req, res) => {
 
     // Teléfono: solo números, 8–15 dígitos
     if (!/^\d{8,15}$/.test(telefono)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "El teléfono debe contener solo números y tener entre 8 y 15 dígitos",
-        });
+      return res.status(400).json({
+        error:
+          "El teléfono debe contener solo números y tener entre 8 y 15 dígitos",
+      });
     }
 
     // Evitar duplicados de email o DNI
@@ -108,12 +100,9 @@ export const updatePaciente = (req, res) => {
     }
 
     if (!/^\d{7,8}$/.test(dni)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "El DNI debe contener solo números y tener entre 7 y 8 dígitos",
-        });
+      return res.status(400).json({
+        error: "El DNI debe contener solo números y tener entre 7 y 8 dígitos",
+      });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -121,12 +110,10 @@ export const updatePaciente = (req, res) => {
     }
 
     if (!/^\d{8,15}$/.test(telefono)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "El teléfono debe contener solo números y tener entre 8 y 15 dígitos",
-        });
+      return res.status(400).json({
+        error:
+          "El teléfono debe contener solo números y tener entre 8 y 15 dígitos",
+      });
     }
 
     // Comprobar si existe
